@@ -78,7 +78,7 @@ export default function SkillsSection() {
     { 
       name: "Next.js", 
       icon: <RiNextjsFill className="w-10 h-10 text-black dark:text-white" />, 
-      color: "bg-black/5 border-black/20 dark:bg-white/5 dark:border-white/20" 
+      color: "bg-neutral-200/10 border-neutral-500/20" 
     },
     { 
       name: "TypeScript", 
@@ -217,7 +217,7 @@ export default function SkillsSection() {
                 whileHover={{ y: -5, transition: { duration: 0.2 } }}
               >
                 <motion.div
-                  className={`w-16 h-16 md:w-20 md:h-20 rounded-2xl flex items-center justify-center bg-slate-800 border border-slate-700 mb-2 group-hover:border-cyan-500 transition-all ${tech.color}`}
+                  className={`w-16 h-16 md:w-20 md:h-20 rounded-2xl flex items-center justify-center mb-2 group-hover:border-cyan-500 transition-all ${tech.color}`}
                   whileHover={{
                     boxShadow: "0 0 20px rgba(6, 182, 212, 0.3)",
                     transition: { duration: 0.2 },
