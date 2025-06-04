@@ -7,17 +7,23 @@ import {
   Server, 
   Layers, 
   Cpu, 
-  Webhook, 
-  Framer, 
-  FileType2, 
-  Wind, 
-  ServerCog, 
-  Figma as FigmaIcon, 
-  FileJson, 
-  FileCode2, 
-  FileStack, 
-  GitBranch
 } from "lucide-react"
+import {
+  FaReact,
+  FaNode,
+  FaFigma,
+  FaHtml5,
+  FaCss3Alt,
+  FaGithub
+} from "react-icons/fa"
+import {
+  RiNextjsFill,
+  RiTailwindCssFill,
+  RiJavascriptFill
+} from "react-icons/ri"
+import {
+  BiLogoTypescript
+} from "react-icons/bi"
 
 export default function SkillsSection() {
   const containerVariants = {
@@ -66,52 +72,52 @@ export default function SkillsSection() {
   const technologies = [
     { 
       name: "React", 
-      icon: <Webhook className="w-10 h-10 text-blue-500" />, 
+      icon: <FaReact className="w-10 h-10 text-blue-500" />, 
       color: "bg-blue-500/10 border-blue-500/20" 
     },
     { 
       name: "Next.js", 
-      icon: <Framer className="w-10 h-10 text-black dark:text-white" />, 
+      icon: <RiNextjsFill className="w-10 h-10 text-black dark:text-white" />, 
       color: "bg-black/5 border-black/20 dark:bg-white/5 dark:border-white/20" 
     },
     { 
       name: "TypeScript", 
-      icon: <FileType2 className="w-10 h-10 text-blue-600" />, 
+      icon: <BiLogoTypescript className="w-10 h-10 text-blue-600" />, 
       color: "bg-blue-600/10 border-blue-600/20" 
     },
     { 
       name: "Tailwind CSS", 
-      icon: <Wind className="w-10 h-10 text-cyan-500" />, 
+      icon: <RiTailwindCssFill className="w-10 h-10 text-cyan-500" />, 
       color: "bg-cyan-500/10 border-cyan-500/20" 
     },
     { 
       name: "Node.js", 
-      icon: <ServerCog className="w-10 h-10 text-green-600" />, 
+      icon: <FaNode className="w-10 h-10 text-green-600" />, 
       color: "bg-green-600/10 border-green-600/20" 
     },
     { 
       name: "Figma", 
-      icon: <FigmaIcon className="w-10 h-10 text-purple-500" />, 
+      icon: <FaFigma className="w-10 h-10 text-purple-500" />, 
       color: "bg-purple-500/10 border-purple-500/20" 
     },
     { 
       name: "JavaScript", 
-      icon: <FileJson className="w-10 h-10 text-yellow-400" />, 
+      icon: <RiJavascriptFill className="w-10 h-10 text-yellow-400" />, 
       color: "bg-yellow-400/10 border-yellow-400/20" 
     },
     { 
       name: "HTML5", 
-      icon: <FileCode2 className="w-10 h-10 text-orange-500" />, 
+      icon: <FaHtml5 className="w-10 h-10 text-orange-500" />, 
       color: "bg-orange-500/10 border-orange-500/20" 
     },
     { 
       name: "CSS3", 
-      icon: <FileStack className="w-10 h-10 text-blue-400" />, 
+      icon: <FaCss3Alt className="w-10 h-10 text-blue-400" />, 
       color: "bg-blue-400/10 border-blue-400/20" 
     },
     { 
       name: "Git", 
-      icon: <GitBranch className="w-10 h-10 text-red-500" />, 
+      icon: <FaGithub className="w-10 h-10 text-red-500" />, 
       color: "bg-red-500/10 border-red-500/20" 
     },
   ]
