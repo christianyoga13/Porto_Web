@@ -50,7 +50,7 @@ export default function SkillsSection() {
     {
       title: "Frontend Development",
       icon: <Code className="w-6 h-6" />,
-      skills: ["React", "Next.js", "TypeScript/JavaScript", "Tailwind CSS", "Bootstrap", "Laravel", "HTML/CSS", "PHP"],
+      skills: ["React", "React Native", "Next.js", "Electron.js", "Laravel", "TypeScript/JavaScript", "Tailwind CSS", "Bootstrap", "HTML/CSS", "PHP"],
     },
     {
       title: "UI/UX Design",
@@ -60,7 +60,7 @@ export default function SkillsSection() {
     {
       title: "Backend Development",
       icon: <Server className="w-6 h-6" />,
-      skills: ["Node.js", "Express", "Firebase", "Supabase", "RESTful APIs", "Authentication", "Database Design"],
+      skills: ["Node.js", "Express.js", "Nest.js", "Firebase", "Supabase", "Prisma", "Sequelize", "RESTful APIs", "Database Design"],
     },
     {
       title: "Other Technologies",

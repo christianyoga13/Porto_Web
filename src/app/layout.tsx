@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import BrowserTabsWrapper from "@/components/modern-tabs/browser-tabs-wrapper"
+import AuthProvider from "@/components/AuthProvider"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,10 +29,12 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased h-screen flex flex-col`}
       >
-        <BrowserTabsWrapper />
-        <main className="flex-1 overflow-auto">
-          {children}
-        </main>
+        <AuthProvider>
+          <BrowserTabsWrapper />
+          <main className="flex-1 overflow-auto">
+            {children}
+          </main>
+        </AuthProvider>
       </body>
     </html>
   );

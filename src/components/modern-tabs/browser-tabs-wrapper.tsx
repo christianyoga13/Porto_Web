@@ -1,40 +1,51 @@
 "use client"
 
-import { FileText, Globe, Home, Settings } from "lucide-react"
+import { FolderOpen, Home, Newspaper } from "lucide-react"
 import { BrowserTabs } from "./browser-tabs"
 import { BrowserToolbar } from "./browser-toolbar"
+import { useRouter, usePathname } from "next/navigation"
 
 export default function BrowserTabsWrapper() {
+  const router = useRouter()
+  const pathname = usePathname()
+
   const tabs = [
     {
       id: "home",
-      title: "Dashboard",
+      title: "Portfolio",
       icon: <Home className="h-4 w-4" />,
-      isActive: true,
+      isActive: pathname === "/",
     },
     {
-      id: "docs",
-      title: "Documentation",
-      icon: <FileText className="h-4 w-4" />,
+      id: "projects",
+      title: "Projects",
+      icon: <FolderOpen className="h-4 w-4" />,
+      isActive: pathname === "/projects",
     },
     {
-      id: "settings",
-      title: "Settings",
-      icon: <Settings className="h-4 w-4" />,
-    },
-    {
-      id: "website",
-      title: "Example Website",
-      icon: <Globe className="h-4 w-4" />,
+      id: "news",
+      title: "Tech News",
+      icon: <Newspaper className="h-4 w-4" />,
+      isActive: pathname === "/news",
     },
   ]
+
+  const handleTabChange = (tabId: string) => {
+    if (tabId === "projects") {
+      router.push("/projects")
+    } else if (tabId === "home") {
+      router.push("/")
+    } else if (tabId === "news") {
+      router.push("/news")
+    }
+  }
 
   return (
     <div className="w-full">
       <div className="bg-zinc-900">
         <BrowserTabs
           tabs={tabs}
-          onTabChange={(tabId) => console.log(`Tab changed to: ${tabId}`)}
+          onTabChange={handleTabChange}
           onTabClose={(tabId) => console.log(`Tab closed: ${tabId}`)}
           onNewTab={() => console.log("New tab requested")}
         />

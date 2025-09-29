@@ -1,15 +1,54 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { ArrowLeft, ExternalLink, Github, Search } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
-import { projects, projectCategories } from "@/data/projects"
+
+interface Project {
+  id: number
+  title: string
+  description: string
+  image: string
+  technologies: string[]
+  liveLink: string
+  githubLink: string
+  category: "web" | "mobile" | "ui" | "other"
+  featured: boolean
+}
+
+const projectCategories = [
+  { value: "all", label: "All Projects" },
+  { value: "web", label: "Web Development" },
+  { value: "mobile", label: "Mobile Apps" },
+  { value: "ui", label: "UI/UX Design" },
+  { value: "other", label: "Other" },
+]
 
 export default function ProjectsPage() {
+  const [projects, setProjects] = useState<Project[]>([])
+  const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState("all")
   const [searchQuery, setSearchQuery] = useState("")
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const response = await fetch('/api/projects')
+        if (response.ok) {
+          const data = await response.json()
+          setProjects(data)
+        }
+      } catch (error) {
+        console.error('Error fetching projects:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchProjects()
+  }, [])
 
   // Animation variants
   const containerVariants = {
@@ -41,6 +80,17 @@ export default function ProjectsPage() {
 
     return matchesCategory && matchesSearch
   })
+
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-gradient-to-b from-[#0f172a] to-[#1e293b] text-white">
+        <div className="container mx-auto px-4 py-20 text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-white mx-auto"></div>
+          <p className="mt-4 text-lg">Loading projects...</p>
+        </div>
+      </main>
+    )
+  }
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-[#0f172a] to-[#1e293b] text-white">
@@ -86,15 +136,15 @@ export default function ProjectsPage() {
           <div className="flex flex-wrap gap-2 justify-center">
             {projectCategories.map((category) => (
               <button
-                key={category.id}
-                onClick={() => setFilter(category.id)}
+                key={category.value}
+                onClick={() => setFilter(category.value)}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                  filter === category.id
+                  filter === category.value
                     ? "bg-gradient-to-r from-cyan-500 to-purple-600 text-white"
                     : "bg-slate-800 text-slate-300 hover:bg-slate-700"
                 }`}
               >
-                {category.name}
+                {category.label}
               </button>
             ))}
           </div>
@@ -164,20 +214,33 @@ export default function ProjectsPage() {
                     ))}
                   </div>
                   <div className="flex gap-4">
-                    <motion.a
-                      href={project.liveLink}
-                      className="flex items-center gap-1 text-sm text-white font-medium hover:text-cyan-400 transition-colors"
-                      whileHover={{ x: 3 }}
-                    >
-                      <ExternalLink className="w-4 h-4" /> Live Demo
-                    </motion.a>
-                    <motion.a
-                      href={project.githubLink}
-                      className="flex items-center gap-1 text-sm text-white font-medium hover:text-cyan-400 transition-colors"
-                      whileHover={{ x: 3 }}
-                    >
-                      <Github className="w-4 h-4" /> View Code
-                    </motion.a>
+                    {project.liveLink && (
+                      <motion.a
+                        href={project.liveLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1 text-sm text-white font-medium hover:text-cyan-400 transition-colors"
+                        whileHover={{ x: 3 }}
+                      >
+                        <ExternalLink className="w-4 h-4" /> Live Demo
+                      </motion.a>
+                    )}
+                    {project.githubLink && (
+                      <motion.a
+                        href={project.githubLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1 text-sm text-white font-medium hover:text-cyan-400 transition-colors"
+                        whileHover={{ x: 3 }}
+                      >
+                        <Github className="w-4 h-4" /> View Code
+                      </motion.a>
+                    )}
+                    {!project.liveLink && !project.githubLink && (
+                      <span className="text-sm text-slate-500 font-medium">
+                        Project showcase only
+                      </span>
+                    )}
                   </div>
                 </div>
               </motion.div>

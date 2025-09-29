@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Plus } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { BrowserTab } from "./browser-tab"
@@ -23,12 +23,25 @@ interface BrowserTabsProps {
 }
 
 export function BrowserTabs({ tabs = [], onTabChange, onTabClose, onNewTab, className }: BrowserTabsProps) {
-  const [activeTabs, setActiveTabs] = useState<Tab[]>(
-    tabs.map((tab, index) => ({
-      ...tab,
-      isActive: tab.isActive || index === 0,
-    })),
-  )
+  const [activeTabs, setActiveTabs] = useState<Tab[]>(() => {
+    // Use the exact isActive values from props, fallback to first tab if none are active
+    const hasActiveTab = tabs.some(tab => tab.isActive === true)
+    if (hasActiveTab) {
+      return tabs.map(tab => ({ ...tab, isActive: Boolean(tab.isActive) }))
+    } else {
+      return tabs.map((tab, index) => ({ ...tab, isActive: index === 0 }))
+    }
+  })
+
+  // Sync internal state with prop changes
+  useEffect(() => {
+    const hasActiveTab = tabs.some(tab => tab.isActive === true)
+    if (hasActiveTab) {
+      setActiveTabs(tabs.map(tab => ({ ...tab, isActive: Boolean(tab.isActive) })))
+    } else {
+      setActiveTabs(tabs.map((tab, index) => ({ ...tab, isActive: index === 0 })))
+    }
+  }, [tabs])
 
   const handleTabClick = (tabId: string) => {
     const updatedTabs = activeTabs.map((tab) => ({
