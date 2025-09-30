@@ -2,6 +2,7 @@
 
 import type React from "react"
 import { X } from "lucide-react"
+import Image from "next/image"
 import { cn } from "@/lib/utils"
 
 interface BrowserTabProps {
@@ -26,7 +27,7 @@ export function BrowserTab({ title, icon, favicon, isActive = false, onClick, on
     >
       <div className="flex flex-1 items-center gap-2 overflow-hidden">
         {favicon ? (
-          <img src={favicon || "/placeholder.svg"} alt="" className="h-4 w-4" />
+          <Image src={favicon || "/placeholder.svg"} alt="" width={16} height={16} className="h-4 w-4" />
         ) : icon ? (
           <span className={cn("flex-shrink-0", isActive ? "text-zinc-100" : "text-zinc-500")}>{icon}</span>
         ) : null}

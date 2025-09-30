@@ -46,7 +46,7 @@ function writeProjects(projects: Project[]): void {
 // PUT - Update project
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -55,7 +55,8 @@ export async function PUT(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const projectId = parseInt(params.id)
+    const { id } = await params
+    const projectId = parseInt(id)
     const data = await request.json()
     const projects = readProjects()
     
@@ -99,7 +100,7 @@ export async function PUT(
 // DELETE - Delete project
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -108,7 +109,8 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const projectId = parseInt(params.id)
+    const { id } = await params
+    const projectId = parseInt(id)
     const projects = readProjects()
     
     // Find project index
