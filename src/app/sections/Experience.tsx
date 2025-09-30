@@ -24,7 +24,7 @@ const experiences: Experience[] = [
     period: "Januari 2025 - Present",
     description: "Developing modern web, mobile and desktop applications using React, React Native, Next.js, Electron.js, and TypeScript. Collaborating with cross-functional teams to deliver high-quality user experiences.",
     achievements: [
-      "Built responsive web applications serving 10k+ users",
+      "Built web, mobile and desktop for 15+ clients",
       "Improved application performance by 40%",
       "Led frontend development for 3 major projects"
     ],
@@ -38,7 +38,7 @@ const experiences: Experience[] = [
     period: "Mei 2025 - Agustus 2025",
     description: "Performed end-to-end testing for Odoo ERP websites and custom mobile applications to ensure high-quality performance, functionality, and user experience.",
     achievements: [
-      "Tested 15+ ERP modules for functionality",
+      "Tested 3+ ERP modules for functionality",
       "Implemented quality assurance protocols",
       "Collaborated with development team on bug fixes"
     ],

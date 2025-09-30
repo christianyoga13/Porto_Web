@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
-import { Plus, ExternalLink, Github } from "lucide-react"
+import { Plus, ExternalLink, Github, Edit, Trash2 } from "lucide-react"
 import Image from "next/image"
 import ImageUpload from "@/components/ImageUpload"
 import AdminHeader from "@/components/AdminHeader"
@@ -25,6 +25,7 @@ export default function AdminProjectsPage() {
   const router = useRouter()
   const [projects, setProjects] = useState<Project[]>([])
   const [showAddForm, setShowAddForm] = useState(false)
+  const [editingProject, setEditingProject] = useState<Project | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState({
     title: "",
@@ -36,6 +37,36 @@ export default function AdminProjectsPage() {
     category: "web" as "web" | "mobile" | "ui" | "other",
     featured: false
   })
+
+  const resetForm = () => {
+    setFormData({
+      title: "",
+      description: "",
+      image: "",
+      technologies: "",
+      liveLink: "",
+      githubLink: "",
+      category: "web",
+      featured: false
+    })
+    setEditingProject(null)
+    setShowAddForm(false)
+  }
+
+  const startEdit = (project: Project) => {
+    setFormData({
+      title: project.title,
+      description: project.description,
+      image: project.image,
+      technologies: project.technologies.join(", "),
+      liveLink: project.liveLink,
+      githubLink: project.githubLink,
+      category: project.category,
+      featured: project.featured
+    })
+    setEditingProject(project)
+    setShowAddForm(true)
+  }
 
   useEffect(() => {
     if (status === "loading") return
@@ -61,8 +92,11 @@ export default function AdminProjectsPage() {
     setIsLoading(true)
 
     try {
-      const response = await fetch("/api/projects", {
-        method: "POST",
+      const method = editingProject ? "PUT" : "POST"
+      const url = editingProject ? `/api/projects/${editingProject.id}` : "/api/projects"
+      
+      const response = await fetch(url, {
+        method,
         headers: {
           "Content-Type": "application/json"
         },
@@ -73,27 +107,41 @@ export default function AdminProjectsPage() {
       })
 
       if (response.ok) {
-        setFormData({
-          title: "",
-          description: "",
-          image: "",
-          technologies: "",
-          liveLink: "",
-          githubLink: "",
-          category: "web",
-          featured: false
-        })
-        setShowAddForm(false)
+        resetForm()
         fetchProjects()
+        alert(editingProject ? "Project updated successfully!" : "Project added successfully!")
       } else {
         const error = await response.json()
         alert(`Error: ${error.error}`)
       }
     } catch (error) {
-      console.error("Error adding project:", error)
-      alert("Error adding project")
+      console.error("Error saving project:", error)
+      alert("Error saving project")
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const handleDelete = async (projectId: number) => {
+    if (!confirm("Are you sure you want to delete this project?")) {
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/projects/${projectId}`, {
+        method: "DELETE"
+      })
+
+      if (response.ok) {
+        fetchProjects()
+        alert("Project deleted successfully!")
+      } else {
+        const error = await response.json()
+        alert(`Error: ${error.error}`)
+      }
+    } catch (error) {
+      console.error("Error deleting project:", error)
+      alert("Error deleting project")
     }
   }
 
@@ -130,7 +178,10 @@ export default function AdminProjectsPage() {
             <p className="text-slate-400">Add, edit, or remove projects from your portfolio</p>
           </div>
           <button
-            onClick={() => setShowAddForm(true)}
+            onClick={() => {
+              resetForm()
+              setShowAddForm(true)
+            }}
             className="bg-gradient-to-r from-cyan-500 to-purple-600 text-white px-6 py-3 rounded-lg flex items-center gap-2 hover:shadow-lg hover:shadow-purple-500/20 transition-all"
           >
             <Plus className="w-5 h-5" />
@@ -138,10 +189,9 @@ export default function AdminProjectsPage() {
           </button>
         </div>
 
-        {/* Add Project Form */}
         {showAddForm && (
           <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-2xl p-6 mb-8">
-            <h2 className="text-xl font-bold mb-4">Add New Project</h2>
+            <h2 className="text-xl font-bold mb-4">{editingProject ? "Edit Project" : "Add New Project"}</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -246,11 +296,11 @@ export default function AdminProjectsPage() {
                   disabled={isLoading}
                   className="bg-gradient-to-r from-cyan-500 to-purple-600 text-white px-6 py-2 rounded-lg disabled:opacity-50"
                 >
-                  {isLoading ? "Adding..." : "Add Project"}
+                  {isLoading ? (editingProject ? "Updating..." : "Adding...") : (editingProject ? "Update Project" : "Add Project")}
                 </button>
                 <button
                   type="button"
-                  onClick={() => setShowAddForm(false)}
+                  onClick={resetForm}
                   className="bg-slate-700 text-white px-6 py-2 rounded-lg hover:bg-slate-600"
                 >
                   Cancel
@@ -260,7 +310,6 @@ export default function AdminProjectsPage() {
           </div>
         )}
 
-        {/* Projects Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {projects.map((project) => (
             <div key={project.id} className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-2xl overflow-hidden">
@@ -295,7 +344,8 @@ export default function AdminProjectsPage() {
                     </span>
                   )}
                 </div>
-                <div className="flex gap-2">
+                
+                <div className="flex gap-2 mb-3">
                   {project.liveLink && (
                     <a
                       href={project.liveLink}
@@ -318,11 +368,23 @@ export default function AdminProjectsPage() {
                       Code
                     </a>
                   )}
-                  {!project.liveLink && !project.githubLink && (
-                    <span className="text-xs text-slate-500 px-3 py-1">
-                      No links available
-                    </span>
-                  )}
+                </div>
+
+                <div className="flex gap-2 pt-3 border-t border-slate-600">
+                  <button
+                    onClick={() => startEdit(project)}
+                    className="flex items-center gap-1 text-xs bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded transition-colors"
+                  >
+                    <Edit className="w-3 h-3" />
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDelete(project.id)}
+                    className="flex items-center gap-1 text-xs bg-red-600 hover:bg-red-700 px-3 py-1 rounded transition-colors"
+                  >
+                    <Trash2 className="w-3 h-3" />
+                    Delete
+                  </button>
                 </div>
               </div>
             </div>

@@ -107,19 +107,5 @@
     "githubLink": "#",
     "category": "web",
     "featured": false
-  },
-  {
-    "id": 8,
-    "title": "da",
-    "description": "tes",
-    "image": "/projects/1756720686216-Screenshot1.png",
-    "technologies": [
-      "React",
-      "Kotlin"
-    ],
-    "liveLink": "",
-    "githubLink": "",
-    "category": "web",
-    "featured": false
   }
 ]
