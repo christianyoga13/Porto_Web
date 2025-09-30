@@ -30,9 +30,21 @@ export default function NewsPage() {
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [totalResults, setTotalResults] = useState(0)
-  const [nextPage, setNextPage] = useState<string | null>(null)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [hasMore, setHasMore] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [imageErrors, setImageErrors] = useState<Set<string>>(new Set())
+
+  // Technology categories for quick filtering
+  const techCategories = [
+    { label: 'All Tech', query: '' },
+    { label: 'AI & ML', query: 'artificial intelligence' },
+    { label: 'Startups', query: 'startup' },
+    { label: 'Programming', query: 'programming' },
+    { label: 'Cybersecurity', query: 'cybersecurity' },
+    { label: 'Mobile', query: 'mobile' },
+    { label: 'Cloud', query: 'cloud computing' }
+  ]
 
   const handleImageError = (imageUrl: string) => {
     setImageErrors(prev => new Set(prev).add(imageUrl))
@@ -42,21 +54,34 @@ export default function NewsPage() {
     return imageErrors.has(imageUrl)
   }
 
-  const fetchNews = async (isLoadMore: boolean = false, query: string = '', nextPageToken?: string) => {
+  const fetchNews = async (isLoadMore: boolean = false, query: string = '', page: number = 1) => {
     try {
+      console.log('=== FETCHING NEWS ===')
+      console.log('isLoadMore:', isLoadMore)
+      console.log('query:', query)
+      console.log('page:', page)
+      
       setLoading(true)
       setError(null)
       
       const params = new URLSearchParams()
       if (query.trim()) params.append('query', query.trim())
-      if (nextPageToken) params.append('nextPage', nextPageToken)
+      params.append('page', page.toString())
       
-      console.log('Fetching news with params:', params.toString())
+      const apiUrl = `/api/news?${params.toString()}`
+      console.log('Fetching from:', apiUrl)
       
-      const response = await fetch(`/api/news?${params.toString()}`)
+      const response = await fetch(apiUrl)
+      console.log('Response status:', response.status, response.statusText)
+      
+      if (!response.ok) {
+        const errorText = await response.text()
+        console.error('Response error text:', errorText)
+        throw new Error(`HTTP ${response.status}: ${errorText}`)
+      }
+      
       const data: NewsResponse = await response.json()
-      
-      console.log('News API response:', data)
+      console.log('Response data:', data)
       
       if (!data.success) {
         throw new Error(data.error || 'Failed to fetch news')
@@ -64,38 +89,40 @@ export default function NewsPage() {
       
       if (!isLoadMore) {
         setArticles(data.articles)
+        setCurrentPage(1)
       } else {
         setArticles(prev => [...prev, ...data.articles])
+        setCurrentPage(page)
       }
       
       setTotalResults(data.totalResults)
-      setNextPage(data.nextPage || null)
+      setHasMore(!!data.nextPage)
       
     } catch (err) {
+      console.error('Full error object:', err)
       setError(err instanceof Error ? err.message : 'An error occurred')
-      console.error('Error fetching news:', err)
     } finally {
       setLoading(false)
     }
   }
 
   useEffect(() => {
-    fetchNews(false, '')
+    fetchNews(false, '', 1)
   }, [])
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
-    fetchNews(false, searchQuery)
+    fetchNews(false, searchQuery, 1)
   }
 
   const handleLoadMore = () => {
-    if (nextPage && !loading) {
-      fetchNews(true, searchQuery, nextPage)
+    if (hasMore && !loading) {
+      fetchNews(true, searchQuery, currentPage + 1)
     }
   }
 
   const handleRefresh = () => {
-    fetchNews(false, searchQuery)
+    fetchNews(false, searchQuery, 1)
   }
 
   const formatDate = (dateString: string) => {
@@ -160,48 +187,71 @@ export default function NewsPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            Stay updated with the latest technology news, trends, and innovations from around the world
+            Discover the latest technology news, AI breakthroughs, startup innovations, and tech industry insights from around the world
           </motion.p>
         </div>
 
         {/* Search and Actions */}
         <motion.div
-          className="mb-12 flex flex-col md:flex-row gap-6 justify-between items-center"
+          className="mb-12 space-y-6"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <form onSubmit={handleSearch} className="flex gap-2 w-full max-w-md">
-            <div className="relative flex-1">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Search className="h-5 w-5 text-slate-400" />
+          {/* Technology Categories */}
+          <div className="flex flex-wrap gap-2 justify-center">
+            {techCategories.map((category) => (
+              <button
+                key={category.label}
+                onClick={() => {
+                  setSearchQuery(category.query)
+                  fetchNews(false, category.query, 1)
+                }}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                  searchQuery === category.query
+                    ? "bg-gradient-to-r from-cyan-500 to-purple-600 text-white"
+                    : "bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 border border-slate-700"
+                }`}
+              >
+                {category.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Search Form */}
+          <div className="flex flex-col md:flex-row gap-4 justify-center items-center">
+            <form onSubmit={handleSearch} className="flex gap-2 w-full max-w-md">
+              <div className="relative flex-1">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Search className="h-5 w-5 text-slate-400" />
+                </div>
+                <input
+                  type="text"
+                  className="block w-full pl-10 pr-3 py-2 border border-slate-700 rounded-lg bg-slate-800/50 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                  placeholder="Search AI, startups, programming, cybersecurity..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
               </div>
-              <input
-                type="text"
-                className="block w-full pl-10 pr-3 py-2 border border-slate-700 rounded-lg bg-slate-800/50 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
-                placeholder="Search technology news..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
+              <button
+                type="submit"
+                disabled={loading}
+                className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-600 hover:to-purple-700 disabled:from-slate-600 disabled:to-slate-700 disabled:cursor-not-allowed rounded-lg transition-all duration-300 flex items-center gap-2 font-medium"
+              >
+                {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+                Search
+              </button>
+            </form>
+            
             <button
-              type="submit"
+              onClick={handleRefresh}
               disabled={loading}
-              className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-600 hover:to-purple-700 disabled:from-slate-600 disabled:to-slate-700 disabled:cursor-not-allowed rounded-lg transition-all duration-300 flex items-center gap-2 font-medium"
+              className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 disabled:bg-slate-800 disabled:cursor-not-allowed rounded-lg transition-colors font-medium"
             >
-              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
-              Search
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+              Refresh
             </button>
-          </form>
-          
-          <button
-            onClick={handleRefresh}
-            disabled={loading}
-            className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 disabled:bg-slate-800 disabled:cursor-not-allowed rounded-lg transition-colors font-medium"
-          >
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-            Refresh
-          </button>
+          </div>
         </motion.div>
 
         {/* Results Info */}
@@ -301,7 +351,7 @@ export default function NewsPage() {
         )}
 
           {/* Load More Button */}
-          {!error && nextPage && articles.length > 0 && (
+          {!error && hasMore && articles.length > 0 && (
             <div className="text-center mt-12">
               <button
                 onClick={handleLoadMore}
@@ -340,7 +390,7 @@ export default function NewsPage() {
               <button
                 onClick={() => {
                   setSearchQuery('')
-                  fetchNews(false, '')
+                  fetchNews(false, '', 1)
                 }}
                 className="px-4 py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-700 transition-colors"
               >
