@@ -16,7 +16,7 @@ interface Project {
   technologies: string[]
   liveLink: string
   githubLink: string
-  category: "web" | "mobile" | "ui" | "other"
+  category: "Web" | "Mobile" | "UI" | "Other"
   featured: boolean
 }
 
@@ -34,7 +34,7 @@ export default function AdminProjectsPage() {
     technologies: "",
     liveLink: "",
     githubLink: "",
-    category: "web" as "web" | "mobile" | "ui" | "other",
+    category: "Web" as "Web" | "Mobile" | "UI" | "Other",
     featured: false
   })
 
@@ -46,7 +46,7 @@ export default function AdminProjectsPage() {
       technologies: "",
       liveLink: "",
       githubLink: "",
-      category: "web",
+      category: "Web",
       featured: false
     })
     setEditingProject(null)
@@ -213,10 +213,10 @@ export default function AdminProjectsPage() {
                     onChange={handleChange}
                     className="w-full px-4 py-2 rounded-lg bg-slate-800/50 border border-slate-600 text-white focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
                   >
-                    <option value="web">Web</option>
-                    <option value="mobile">Mobile</option>
-                    <option value="ui">UI/UX</option>
-                    <option value="other">Other</option>
+                    <option value="Web">Web</option>
+                    <option value="Mobile">Mobile</option>
+                    <option value="UI">UI/UX</option>
+                    <option value="Other">Other</option>
                   </select>
                 </div>
               </div>

@@ -12,7 +12,7 @@ interface Project {
   technologies: string[]
   liveLink: string
   githubLink: string
-  category: "web" | "mobile" | "ui" | "other"
+  category: "Web" | "Mobile" | "UI" | "Other"
   featured: boolean
 }
 
